@@ -1,0 +1,18 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Neue Aufgabe</h5>
+        <div class="input-group">
+            <input type="text" class="form-control" [(ngModel)]="newTask" placeholder="Neue Aufgabe eingeben...">
+            <button class="btn btn-primary" (click)="addTask()">Hinzufügen</button>
+        </div>
+    </div>
+</div>
+
+<div class="list-group mt-3">
+    <div class="list-group-item" *ngFor="let task of tasks">
+        {{ task.title }}
+        <span [class.text-success]="task.completed">
+            {{ task.completed ? ' ✅' : ' ⏳' }}
+        </span>
+    </div>
+</div>

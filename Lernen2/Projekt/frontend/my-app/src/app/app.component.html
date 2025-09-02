@@ -1,0 +1,21 @@
+<div style="padding: 20px; font-family: Arial;">
+    <h1>Meine Django-Angular App</h1>
+
+    <div style="background: white; padding: 20px; border-radius: 10px;">
+        <h3>Neue Aufgabe</h3>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" [(ngModel)]="newTask" placeholder="Neue Aufgabe..."
+                style="flex: 1; padding: 10px; border: 1px solid #ddd;">
+            <button (click)="addTask()" style="padding: 10px 20px; background: #007bff; color: white; border: none;">
+                Hinzufügen
+            </button>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <h3>Aufgabenliste</h3>
+        <div *ngFor="let task of tasks" style="padding: 10px; border: 1px solid #ddd; margin-bottom: 5px;">
+            {{ task.title }}
+        </div>
+    </div>
+</div>

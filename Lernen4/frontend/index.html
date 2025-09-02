@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Task Manager mit Datenbank</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .task {
+            padding: 10px;
+            border: 1px solid #eee;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .completed {
+            background: #d4edda;
+            text-decoration: line-through;
+        }
+
+        .task-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>✅ Task Manager mit Datenbank</h1>
+
+        <h3>Neue Aufgabe:</h3>
+        <div>
+            <input id="newTask" placeholder="Was möchtest du tun?">
+            <button onclick="addTask()">Hinzufügen</button>
+        </div>
+
+        <h3>Deine Aufgaben (aus Datenbank):</h3>
+        <button onclick="loadTasks()">Aufgaben laden</button>
+        <div id="tasks"></div>
+
+        <div id="message" style="margin-top: 20px; padding: 10px; border-radius: 5px;"></div>
+    </div>
+
+    <script>
+        // Aufgaben von der API laden
+        async function loadTasks() {
+            try {
+                const response = await fetch('http://localhost:8000/api/tasks');
+                const tasks = await response.json();
+
+                const tasksContainer = document.getElementById('tasks');
+                tasksContainer.innerHTML = '';
+
+                tasks.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = `task ${task.completed ? 'completed' : ''}`;
+                    taskDiv.innerHTML = `
+                        <span>${task.completed ? '✅' : '⏳'} ${task.title}</span>
+                        <div class="task-buttons">
+                            <button onclick="toggleTask(${task.id}, ${!task.completed})">
+                                ${task.completed ? 'Zurücksetzen' : 'Erledigt'}
+                            </button>
+                            <button onclick="deleteTask(${task.id})" style="background: #dc3545;">Löschen</button>
+                        </div>
+                    `;
+                    tasksContainer.appendChild(taskDiv);
+                });
+
+                showMessage('✅ Aufgaben geladen!', 'success');
+            } catch (error) {
+                showMessage('❌ Server nicht erreichbar. Starte: python server.py', 'error');
+            }
+        }
+
+        // Neue Aufgabe hinzufügen
+        async function addTask() {
+            const input = document.getElementById('newTask');
+            if (input.value) {
+                try {
+                    const response = await fetch('http://localhost:8000/api/tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title: input.value })
+                    });
+
+                    if (response.ok) {
+                        input.value = '';
+                        loadTasks(); // Aufgaben neu laden
+                        showMessage('✅ Aufgabe gespeichert!', 'success');
+                    }
+                } catch (error) {
+                    showMessage('❌ Fehler beim Speichern', 'error');
+                }
+            }
+        }
+
+        // Aufgabe löschen (einfache Version)
+        async function deleteTask(id) {
+            if (confirm('Aufgabe wirklich löschen?')) {
+                showMessage('⚠️ Löschen-Funktion kommt später...', 'info');
+            }
+        }
+
+        // Aufgabe umschalten (einfache Version)
+        async function toggleTask(id, completed) {
+            showMessage('⚠️ Update-Funktion kommt später...', 'info');
+        }
+
+        // Nachricht anzeigen
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.style.background = type === 'error' ? '#f8d7da' :
+                type === 'success' ? '#d4edda' : '#fff3cd';
+            messageDiv.style.color = type === 'error' ? '#721c24' :
+                type === 'success' ? '#155724' : '#856404';
+
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.style.background = '';
+            }, 3000);
+        }
+
+        // Beim Start automatisch Aufgaben laden
+        loadTasks();
+    </script>
+</body>
+
+</html>
